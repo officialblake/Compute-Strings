@@ -1,6 +1,7 @@
 // dfa.cpp
 #include "dfa.h" 
 
-int DFA::state0(int n) {
-    return n;
+int DFA::begin(int n) {
+    char ch = 'a'; // Placeholder
+    State *state = new State(ch, buffer);
 }
