@@ -8,9 +8,9 @@ bool DFA::containsAllSymbols(std::array<char, 5> buffer){
     } 
     for (int i = 0; i < buffer.size(); i++) {
         if (buffer.at(i) == 'a') a = true;
-        else if (buffer.at(i) == 'b') a = true;
-        else if (buffer.at(i) == 'c') a = true;
-        else if (buffer.at(i) == 'd') a = true;
+        else if (buffer.at(i) == 'b') b = true;
+        else if (buffer.at(i) == 'c') c = true;
+        else if (buffer.at(i) == 'd') d = true;
     }
     return a && b && c && d;
 }
