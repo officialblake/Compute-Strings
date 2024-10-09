@@ -2,18 +2,18 @@
 #ifndef DFA_H // include guard
 #define DFA_H 
 #include <iostream>
-#include "state.h"
 
 class DFA
 {
 private:
-    std::vector<char> buffer;
     // Function prototypes for the different DFA states
-    int state0(int n);  // Normal state, reading code
+    bool containsAllSymbols(std::array<char, 5> buffer);
+    int encode(std::array<char, 5> buffer);
+    std::array<char, 5> emplace(std::array<char, 5> buffer, char ch);
 public:
     DFA() {}
     ~DFA() { delete this; };
-    int begin(int n);
+    std::vector<std::vector<int>> generateDFA(std::vector<std::array<char, 5>> allBuffers);
 };
 
 
