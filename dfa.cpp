@@ -17,7 +17,7 @@ bool DFA::containsAllSymbols(std::array<char, 5> buffer){
 
 int DFA::encode(std::array<char, 5> buffer){
     int encoding = 0;
-    for (int i = buffer.size() - 1; i <= 0; i--) {
+    for (int i = buffer.size() - 1; i >= 0; i--) {
         
         if (buffer.at(i) == 'a') {
             encoding += (0 * static_cast<int>(std::pow(4, 4 - i)));
