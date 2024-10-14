@@ -36,33 +36,50 @@ int verifyDFA(std::vector<std::vector<int>> states, int n){
     return 0;
 }
 
-int countStates(std::vector<std::vector<int>> states, int n, int count) {
-    if (n == 5) {  // Base case: When n is 0, stop recursion
-        return count;
+void countStatesRecursive(std::vector<std::vector<int>>& states, std::vector<int>& prev, int n, int& count) {
+    if (n == 5) {  // Base case: When n reaches 0, stop recursion
+        return;
     }
-    count = 0;
-    std::vector<int> nextStates;
-    std::cout << "size of state vec " << states.size() << std::endl;
-    // Process the current states and transition to next states
-    count = 0;
-    for (int i = 0; i < states.size(); i++) {
-        for (int j = 0; j < 4; j++) {  // Iterate over alphabet {a, b, c, d}
-            if (states[i][j] > 0) {  // Valid transition
-                count++;  // Increment count for each valid transition
-                nextStates.push_back(states[i][j]);  // Track next states
+
+    std::vector<int> next(prev.size(), 0);  // Create a new vector to track the next states
+
+    // Iterate over each state in the current `prev` vector
+    for (int i = 0; i < prev.size(); ++i) {
+        if (prev[i] > 0) {  // Only process states that have valid transitions
+            for (int j = 0; j < 4; ++j) {  // Iterate over alphabet {a, b, c, d}
+                int nextState = states[i][j];  // Get the next state for the current state
+                if (nextState > 0) {  // Valid transition
+                    count++;  // Increment count for valid transitions
+                    next[nextState] += prev[i];  // Accumulate counts into the next vector
+                }
             }
-            //std::cout << "i = " << i << " j = " << j << " next state = " << states[i][j] << std::endl;
         }
     }
 
-    // Create a new vector of next states and call recursively
-    std::vector<std::vector<int>> nextStatesVector(nextStates.size(), std::vector<int>(4));
-    for (int i = 0; i < nextStates.size(); ++i) {
-        nextStatesVector[i] = states[nextStates[i]];
+    // Recursively call with the `next` vector for the next step
+    countStatesRecursive(states, next, n - 1, count);
+}
+
+int countStates(std::vector<std::vector<int>> states, int n) {
+    int m = states.size();
+    std::vector<int> prev(m, 0);  // Vector to store the current state's transitions
+
+    // Initialize the `prev` vector by checking if each state is accepting
+    for (int i = 0; i < m; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (states[i][j] > 0) {
+                prev[i] = 1;  // Mark initial valid states
+                break;
+            }
+        }
     }
 
-    return countStates(nextStatesVector, n - 1, count);
+    int count = 0;  // Initialize count of transitions
+    countStatesRecursive(states, prev, n, count);  // Start recursive processing
+
+    return count;
 }
+
 
 int main(){
     int n;
@@ -71,7 +88,7 @@ int main(){
 
     DFA *dfa = new DFA();
     int count = 0;
-    count = countStates(dfa->generateDFA(all_possible_buffers()), n, count);
+    count = countStates(dfa->generateDFA(all_possible_buffers()), n);
     std::cout << "Final count = " << count << std::endl;
     delete dfa;
     return 0;
