@@ -1,6 +1,7 @@
 #include <iostream>
 #include "dfa.h"
 #include <numeric>
+#include <gmpxx.h>
 
 std::vector<std::array<char, 5>> all_possible_buffers() {
     std::vector<std::array<char, 5>> buffers;
@@ -36,7 +37,7 @@ int verifyDFA(std::vector<std::vector<int>> states, int n){
     std::cout << "states w trans = " << count << std::endl;
     return 0;
 }
-void countStatesRecursive(const std::vector<std::vector<int>>& states, std::vector<__int128>& current, int n, __int128& count) {
+void countStatesRecursive(const std::vector<std::vector<int>>& states, std::vector<mpz_class>& current, int n, mpz_class& count) {
     switch (n) {
         case 5:
             count = std::pow(4, 5);
@@ -60,7 +61,7 @@ void countStatesRecursive(const std::vector<std::vector<int>>& states, std::vect
     }
 
 
-    std::vector<__int128> next(current.size(), 0);  // Track the next states' counts
+    std::vector<mpz_class> next(current.size(), 0);  // Track the next states' counts
 
     // Iterate over each state in the current vector
     for (int i = 0; i < current.size(); ++i) {
@@ -78,14 +79,18 @@ void countStatesRecursive(const std::vector<std::vector<int>>& states, std::vect
     countStatesRecursive(states, next, n - 1, count);
     //std::cout << " count is currently = " << (long long)count << " when n = " << n << std::endl;
     // Update the total count (number of accepted transitions)
-    if (count <= 1024) {
-        count = std::accumulate(next.begin(), next.end(), 0);
+  if (count <= 1024) {
+    mpz_class sum = 0;
+    for (const auto& elem : next) {
+        sum += elem;  // Use GMP's addition operator for mpz_class
     }
+    count = sum;
+}
 }
 
-__int128 countStates(const std::vector<std::vector<int>>& states, int n) {
+mpz_class countStates(const std::vector<std::vector<int>>& states, int n) {
     int m = states.size();
-    std::vector<__int128> current(m, 1);  // Initially set all states with 1 for uniform start
+    std::vector<mpz_class> current(m, 1);  // Initially set all states with 1 for uniform start
 
     // Initialize the `current` vector for valid starting states
     for (int i = 0; i < m; ++i) {
@@ -101,7 +106,7 @@ __int128 countStates(const std::vector<std::vector<int>>& states, int n) {
         }
     }
 
-    __int128 count = 0;  // Initialize count of transitions
+    mpz_class count = 0;  // Initialize count of transitions
     countStatesRecursive(states, current, n, count);  // Start recursive processing
 
     return count;  // Return the final count
@@ -114,9 +119,9 @@ int main(){
     std::cin >> n;
 
     DFA *dfa = new DFA();
-    __int128 count = 0;
+    mpz_class count = 0;
     count = countStates(dfa->generateDFA(all_possible_buffers()), n);
-    std::cout << "Final count = " << (long long)count << std::endl;
+    std::cout << "Final count = " << count << std::endl;
     dfa = nullptr;
     delete dfa;
     return 0;
