@@ -114,6 +114,8 @@ mpz_class countStates(const std::vector<std::vector<int>>& states, int n) {
 
 
 int main(){
+     mpz_t result;
+    mpz_init(result);  
     int n;
     std::cout << "Enter an integer (1 - 300).\n n = ";
     std::cin >> n;

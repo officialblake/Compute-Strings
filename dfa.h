@@ -2,6 +2,7 @@
 #ifndef DFA_H // include guard
 #define DFA_H 
 #include <iostream>
+#include <gmpxx.h>
 
 class DFA
 {
@@ -13,7 +14,7 @@ private:
 public:
     DFA() {}
     ~DFA() { delete this; };
-    std::vector<std::vector<int>> generateDFA(std::vector<std::array<char, 5>> allBuffers);
+    mpz_class generateDFA(mpz_t result, int n);
 };
 
 

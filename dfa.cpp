@@ -2,12 +2,10 @@
 #include "dfa.h" 
 
 bool DFA::containsAllSymbols(std::array<char, 5> buffer){
-    bool a, b, c, d;
-    if (buffer.size() < 5){
-        return true;
-    } 
+    bool a=false, b=false, c=false, d=false;
     for (int i = 0; i < buffer.size(); i++) {
-        if (buffer.at(i) == 'a') a = true;
+        if (buffer.at(i) == '\0') return true;
+        else if (buffer.at(i) == 'a') a = true;
         else if (buffer.at(i) == 'b') b = true;
         else if (buffer.at(i) == 'c') c = true;
         else if (buffer.at(i) == 'd') d = true;
@@ -33,32 +31,24 @@ int DFA::encode(std::array<char, 5> buffer){
         }
     }
     return encoding;
-}
-
-std::array<char, 5> DFA::emplace(std::array<char, 5> buffer, char ch){
-    if (buffer.size() < 5){
-        buffer.back() = ch;
-    } 
-    for (int i = 0; i < 4; i++){
-        buffer.at(i) = buffer.at(i + 1);
+}ss
+mpz_class DFA::generateDFA(mpz_t result, int n){
+    if (n <= 5) {
+        mpz_ui_pow_ui(result, 4, n); 
     }
-    buffer.at(4) = ch;
-    return buffer;
-}
+    std::vector<std::array<char, 5>> valid_states;
 
-std::vector<std::vector<int>> DFA::generateDFA(std::vector<std::array<char, 5>> allBuffers){
-    std::vector<std::vector<int>> states(allBuffers.size(), std::vector<int>(4, -1));
-    char alphabet[4] = {'a', 'b', 'c', 'd'};
-    for (int i = 0; i < allBuffers.size(); i++){
-        for (char ch : alphabet) {
-            std::array<char, 5> newBuffer = emplace(allBuffers.at(i), ch);
-            int transitionIndex = (ch == 'a') ? 0 : (ch == 'b') ? 1 : (ch == 'c') ? 2 : 3;
-            if (containsAllSymbols(newBuffer)){
-                states.at(i).at(transitionIndex) = encode(newBuffer);
-            } else {
-                states.at(i).at(transitionIndex) = 0;
-            }
+    for (int i = 0; i < pow(4, 6); i++) {
+        std::array<char, 5> tempBuffer;
+        int ind = 0;
+        for (int j = 0; j < 6; j++) {  // Convert the integer `i` to a 6-character string of {a, b, c, d}
+            tempBuffer[j] = static_cast<char>('a' + (ind % 4));
+            ind /= 4;
+        }
+        if (containsAllSymbols(tempBuffer)) {
+            valid_states.push_back(tempBuffer);
         }
     }
-    return states;
+
+    return 0;
 }
