@@ -8,13 +8,14 @@ class DFA
 {
 private:
     // Function prototypes for the different DFA states
-    bool containsAllSymbols(std::array<char, 5> buffer);
+    bool containsAllSymbols(std::array<char, 6> buffer);
     int encode(std::array<char, 5> buffer);
     std::array<char, 5> emplace(std::array<char, 5> buffer, char ch);
+    char getChar(int i);
 public:
-    DFA() {}
-    ~DFA() { delete this; };
-    mpz_class generateDFA(mpz_t result, int n);
+    void generateDFA(mpz_t result, int n);
+    DFA() {};
+    ~DFA() {};
 };
 
 

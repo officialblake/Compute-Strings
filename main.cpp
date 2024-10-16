@@ -2,119 +2,75 @@
 #include "dfa.h"
 #include <numeric>
 #include <gmpxx.h>
+#include "bigWrapper.h"
+#include <algorithm>
+using namespace std;
+// void countValidStrings(int n, mpz_t result) {
+//     // Edge case: For strings of length <= 5, all combinations are valid
+//     if (n <= 5) {
+//         mpz_ui_pow_ui(result, 4, n);  // 4^n combinations since there are 4 characters
+//         return;
+//     }
 
-std::vector<std::array<char, 5>> all_possible_buffers() {
-    std::vector<std::array<char, 5>> buffers;
-    char alphabet[4] = {'a', 'b', 'c', 'd'};
-    int length = 5;
-    int num_combinations = std::pow(4, length);
-    
-    for (int i = 0; i < num_combinations; i++) {
-        std::array<char, 5> buffer; 
-        int temp = i;
+//     // Pre-calculate all valid combinations of 6 characters over {a, b, c, d}
+//     // that contain at least one 'a', 'b', 'c', and 'd'
+//     std::vector<std::string> valid_states;
+//     for (int i = 0; i < pow(4, 6); i++) {  // Iterate through all possible 6-character combinations
+//         std::string window;
+//         int temp = i;
+//         for (int j = 0; j < 6; j++) {  // Convert the integer `i` to a 6-character string of {a, b, c, d}
+//             window.push_back(static_cast<char>('a' + (temp % 4)));  // Mod by 4 to get one of the characters
+//             temp /= 4;
+//         }
 
-        for (int j = length - 1; j >= 0; j--) {
-            buffer[j] = alphabet[temp % 4];
-            temp /= 4;
-        }
-        buffers.push_back(buffer);
-    }
+//         // Check if the window contains at least one 'a', 'b', 'c', and 'd'
+//         if (count(window.begin(), window.end(), 'a') > 0 &&
+//             count(window.begin(), window.end(), 'b') > 0 &&
+//             count(window.begin(), window.end(), 'c') > 0 &&
+//             count(window.begin(), window.end(), 'd') > 0) {
+//             valid_states.push_back(window);  // Only keep valid windows
+//         }
+//     }
 
-    return buffers;
-}
+//     // Create a map from each valid state (string) to an index for fast lookup
+//     unordered_map<std::string, int> state_to_index;
+//     for (int idx = 0; idx < valid_states.size(); idx++) {
+//         state_to_index[valid_states[idx]] = idx;
+//     }
 
-int verifyDFA(std::vector<std::vector<int>> states, int n){
-    int count = 0;
-    for (int i = 0; i < states.size(); i++) {
-        for (int j = 0; j < 4; j++) {
-            
-            if (states[i][j] > 0) {
-                count++;
-            }
-            std::cout << "i = " << i << " j = " << j << " next state = " << states[i][j] << std::endl;
-        }
-    }
-    std::cout << "states w trans = " << count << std::endl;
-    return 0;
-}
-void countStatesRecursive(const std::vector<std::vector<int>>& states, std::vector<mpz_class>& current, int n, mpz_class& count) {
-    switch (n) {
-        case 5:
-            count = std::pow(4, 5);
-            return;
-        case 4:
-            count = std::pow(4, 4);
-            return;
-        case 3:
-            count = std::pow(4, 3);
-            return;
-        case 2:
-            count = std::pow(4, 2);
-            return;
-        case 1:
-            count = std::pow(4, 1);
-            return;
-        case 0:
-            return;  // Base case: When n is 0, stop recursion
-        default:
-            break;  // Keep going
-    }
+//     // Initialize the DP table (Dynamic Programming table) to store counts of valid strings
+//     // dp[length][state] holds the number of valid strings of a given length ending with a specific window
+//     vector<vector<MpzWrapper>> dp(n + 1, vector<MpzWrapper>(valid_states.size()));
 
+//     // Initialize the DP table for length 6 (base case)
+//     for (int idx = 0; idx < valid_states.size(); idx++) {
+//         mpz_set_ui(dp[6][idx].value, 1);  // Each valid state of length 6 has one valid string
+//     }
 
-    std::vector<mpz_class> next(current.size(), 0);  // Track the next states' counts
+//     // Populate the DP table for lengths from 7 to n
+//     // Transition from one state (window) to another by sliding the window and appending a new character
+//     for (int length = 7; length <= n; length++) {
+//         for (int idx = 0; idx < valid_states.size(); idx++) {
+//             string state = valid_states[idx];
+//             for (char c : {'a', 'b', 'c', 'd'}) {  // Try appending each character to the current window
+//                 string new_window = state.substr(1) + c;  // Slide the window by dropping the first character and adding a new one
+//                 if (state_to_index.find(new_window) != state_to_index.end()) {
+//                     mpz_add(dp[length][state_to_index[new_window]].value, dp[length][state_to_index[new_window]].value, dp[length - 1][idx].value);
+//                 }
+//             }
+//         }
+//     }
 
-    // Iterate over each state in the current vector
-    for (int i = 0; i < current.size(); ++i) {
-        if (current[i] > 0) {  // Only process states with valid transitions
-            for (int j = 0; j < 4; ++j) {  // Iterate over alphabet {a, b, c, d}
-                int nextState = states[i][j];  // Get the next state for the current state
-                if (nextState > 0) {  // Valid transition (assuming -1 is invalid state)
-                    next[nextState] += current[i];  // Accumulate counts into the next vector
-                }
-            }
-        }
-    }
-
-    // Recursively call with the next vector for the next step
-    countStatesRecursive(states, next, n - 1, count);
-    //std::cout << " count is currently = " << (long long)count << " when n = " << n << std::endl;
-    // Update the total count (number of accepted transitions)
-  if (count <= 1024) {
-    mpz_class sum = 0;
-    for (const auto& elem : next) {
-        sum += elem;  // Use GMP's addition operator for mpz_class
-    }
-    count = sum;
-}
-}
-
-mpz_class countStates(const std::vector<std::vector<int>>& states, int n) {
-    int m = states.size();
-    std::vector<mpz_class> current(m, 1);  // Initially set all states with 1 for uniform start
-
-    // Initialize the `current` vector for valid starting states
-    for (int i = 0; i < m; ++i) {
-        bool hasValidTransition = false;
-        for (int j = 0; j < 4; ++j) {
-            if (states[i][j] >= 0) {  // Check if the state has a valid transition
-                hasValidTransition = true;
-                break;
-            }
-        }
-        if (!hasValidTransition) {
-            current[i] = 0;  // Mark state as invalid if it has no valid transitions
-        }
-    }
-
-    mpz_class count = 0;  // Initialize count of transitions
-    countStatesRecursive(states, current, n, count);  // Start recursive processing
-
-    return count;  // Return the final count
-}
+//     // Sum up all the valid strings of length n from all possible valid states
+//     mpz_set_ui(result, 0);  // Initialize result to 0
+//     for (int idx = 0; idx < valid_states.size(); idx++) {
+//         mpz_add(result, result, dp[n][idx].value);
+//     }
+// }
 
 
 int main(){
-     mpz_t result;
+    mpz_t result;
     mpz_init(result);  
     int n;
     std::cout << "Enter an integer (1 - 300).\n n = ";
@@ -122,8 +78,10 @@ int main(){
 
     DFA *dfa = new DFA();
     mpz_class count = 0;
-    count = countStates(dfa->generateDFA(all_possible_buffers()), n);
-    std::cout << "Final count = " << count << std::endl;
+    std::cout << "Final count = ";
+    dfa->generateDFA(result, n);
+    std::cout << result;
+    cout << endl;
     dfa = nullptr;
     delete dfa;
     return 0;
