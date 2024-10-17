@@ -2,7 +2,9 @@
 #ifndef DFA_H // include guard
 #define DFA_H 
 #include <iostream>
-
+#include <cmath>
+#include <array>
+#include <vector>
 class DFA
 {
 private:

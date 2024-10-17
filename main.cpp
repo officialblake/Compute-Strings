@@ -2,7 +2,9 @@
 #include "dfa.h"
 #include <numeric>
 #include <gmpxx.h>
-
+#include <cmath>
+#include <array>
+#include <vector>
 /** ***************************************************************************
  * Generates all possible buffers of length 5 using the alphabet {a, b, c, d}.*
  *                                                                            *
