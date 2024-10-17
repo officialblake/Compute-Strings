@@ -3,7 +3,7 @@
 #include "bigWrapper.h"
 #include <map>
 
-bool DFA::containsAllSymbols(std::array<char, 6> buffer){
+bool DFA::containsAllSymbols(std::array<char, 5> buffer){
     bool a=false, b=false, c=false, d=false;
     for (int i = 0; i < buffer.size(); i++) {
         if (buffer.at(i) == '\0') return true;
@@ -59,27 +59,24 @@ char DFA::getChar(int i){
 }
 
 void DFA::generateDFA(mpz_t result, int n) {
-    int totalPermutations = pow(4, 6) + 1024;
+    int totalPermutations = pow(4, 5) + 1024;
 
     if (n <= 5) {
         mpz_ui_pow_ui(result, 4, n);
         return; 
     }
 
-    std::vector<std::array<char, 6>> states;
+    std::vector<std::array<char, 5>> states;
 
     for (int i = 0; i < totalPermutations - 1024; i++) {
-        std::array<char, 6> allCharacters;
+        std::array<char, 5> allCharacters;
         int ind = i;
 
-        for (int j = 0; j < 6; j++) { 
+        for (int j = 0; j < 5; j++) { 
             allCharacters[j] = getChar(ind % 4);
             ind /= 4;
         }
-
-        if (containsAllSymbols(allCharacters)) {
-            states.push_back(allCharacters);
-        }
+        states.push_back(allCharacters);
     }
 
     int m = states.size();
@@ -88,32 +85,34 @@ void DFA::generateDFA(mpz_t result, int n) {
     std::vector<std::vector<MPZWrapper>> N(m, std::vector<MPZWrapper>(n + 1));      
 
     // // Initialize Nj(0)
-    // for (int i = 0; i < m; i++) {
-        mpz_set_ui(N[0][0].value, 1);  // Nj(0) = 1 for all states, since all are valid
-    // }
+     for (int i = 0; i < m; i++) {
+        mpz_set_ui(N[i][0].value, 1);  // Nj(0) = 1 for all states, since all are valid
+                             std::cout << "First val: " << N[0][0].value << std::endl;
+
+    }
 
     // Compute Nj(n) using the recurrence relation
     for (int length = 1; length <= n; length++) {
         for (int i = 0; i < m; i++) {
             for (char ch : {'a', 'b', 'c', 'd'}) {  // For each character
-                // Prepare a buffer to hold the last 5 characters
-                std::array<char, 5> buffer = {states[i][1], states[i][2], states[i][3], states[i][4], ch};
+                // Prepare a buffer to hold 5 characters
+             std::array<char, 5> buffer = {states[i][1], states[i][2], states[i][3], states[i][4], ch};
+                                               std::cout << "first: " << N[i][length - 1].value << std::endl;
 
-                // Encode the new state
-                int nextStateIndex = encode(buffer);
-
-                // Check if the nextStateIndex is valid and within bounds
-               // if (nextStateIndex >= 0 && nextStateIndex < m) {
-                    // Update N[nextStateIndex][length] using N[i][length - 1]
-                    mpz_add(N[nextStateIndex][length].value, N[nextStateIndex][length].value, N[i][length - 1].value);
-                //}
+                if (containsAllSymbols(buffer)){
+                     mpz_add(N[encode(buffer)][length].value, N[encode(buffer)][length].value, N[i][length - 1].value);
+                } else {
+                      mpz_set_ui(N[encode(buffer)][length].value, 0);
+                }
+              
             }
         }
     }
 
     // Sum all Nj(n) for the final result
     mpz_set_ui(result, 0);  // Initialize result to 0
-    for (int i = 0; i < m; i++) {
+    for (int i = 0; i < N.size(); i++) {
+        //std::cout << "val: "<< N[i][n].value;
         mpz_add(result, result, N[i][n].value); // Sum all accepted strings of length n
     }
 }
