@@ -9,7 +9,7 @@ badaabcbcdcabaddoes not satisfy the property since the substring aabcbc does not
 
 GMP is required to run this program. 
 
-On unix based systems, this program can be run via: 
+This program can be run via: 
 
 ``` g++ main.cpp dfa.cpp -lgmpxx -lgmp -o proj1.out ```
 
