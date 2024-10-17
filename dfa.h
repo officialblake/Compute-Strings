@@ -14,7 +14,7 @@ private:
     std::array<char, 5> emplace(std::array<char, 5> buffer, char ch);
 public:
     DFA() {}
-    ~DFA() { delete this; };
+    ~DFA() {};
     std::vector<std::vector<int>> generateDFA(std::vector<std::array<char, 5>> allBuffers);
 };
 

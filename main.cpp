@@ -132,7 +132,7 @@ int main(){
     mpz_class count = 0;
     count = countStates(dfa->generateDFA(all_possible_buffers()), n);
     std::cout << "Final count = " << count << std::endl;
-    dfa = nullptr;
     delete dfa;
+    dfa = nullptr;
     return 0;
 }
