@@ -129,6 +129,11 @@ int main(){
     std::cout << "Enter an integer (1 - 300).\n n = ";
     std::cin >> n;
 
+    if (n > 300 || n < 1) {
+        std::cerr << "Error: n out of range. Enter a valid value (1-300).";
+        exit(1);
+    }
+
     DFA *dfa = new DFA();
     mpz_class count = 0;
     count = countStates(dfa->generateDFA(all_possible_buffers()), n);
