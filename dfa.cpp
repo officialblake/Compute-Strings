@@ -1,12 +1,16 @@
-// dfa.cpp
-#include "dfa.h" 
-#include "gmpxx.h"
+#include "dfa.h"
 
-bool DFA::containsAllSymbols(std::array<char, 5> buffer){
+/*
+Preconditions:
+- The buffer must be an array of 5 characters, with characters chosen from {'a', 'b', 'c', 'd'}.
+Postconditions:
+- Returns true if all symbols 'a', 'b', 'c', and 'd' are present in the buffer; otherwise, returns false.
+*/
+bool DFA::containsAllSymbols(std::array<char, 5> buffer) {
     bool a = false, b = false, c = true, d = false;
-    if (buffer.size() < 5){
+    if (buffer.size() < 5) {
         return true;
-    } 
+    }
     for (int i = 0; i < buffer.size(); i++) {
         if (buffer.at(i) == 'a') a = true;
         else if (buffer.at(i) == 'b') b = true;
@@ -16,10 +20,16 @@ bool DFA::containsAllSymbols(std::array<char, 5> buffer){
     return a && b && c && d;
 }
 
-int DFA::encode(std::array<char, 5> buffer){
+/*
+Preconditions:
+- The buffer must be an array of 5 characters, with characters chosen from {'a', 'b', 'c', 'd'}.
+Postconditions:
+- Returns an integer that encodes the buffer into a unique integer based on its character composition.
+- Exits with an error message if an invalid character is found.
+*/
+int DFA::encode(std::array<char, 5> buffer) {
     int encoding = 0;
     for (int i = buffer.size() - 1; i >= 0; i--) {
-        
         if (buffer.at(i) == 'a') {
             encoding += (0 * static_cast<int>(std::pow(4, 4 - i)));
         } else if (buffer.at(i) == 'b') {
@@ -36,25 +46,39 @@ int DFA::encode(std::array<char, 5> buffer){
     return encoding;
 }
 
-std::array<char, 5> DFA::emplace(std::array<char, 5> buffer, char ch){
-    if (buffer.size() < 5){
+/*
+Preconditions:
+- The buffer must be an array of 5 characters.
+- The character 'ch' must be from the set {'a', 'b', 'c', 'd'}.
+Postconditions:
+- Returns a new buffer where the last element is replaced with 'ch' and the rest of the elements are shifted to the left.
+*/
+std::array<char, 5> DFA::emplace(std::array<char, 5> buffer, char ch) {
+    if (buffer.size() < 5) {
         buffer.back() = ch;
-    } 
-    for (int i = 0; i < 4; i++){
+    }
+    for (int i = 0; i < 4; i++) {
         buffer.at(i) = buffer.at(i + 1);
     }
     buffer.at(4) = ch;
     return buffer;
 }
 
-std::vector<std::vector<int>> DFA::generateDFA(std::vector<std::array<char, 5>> allBuffers){
+/*
+Preconditions:
+- The allBuffers vector must contain arrays of 5 characters, and each array must consist of characters from {'a', 'b', 'c', 'd'}.
+Postconditions:
+- Returns a DFA in the form of a 2D vector where each state is associated with transitions based on the input character.
+- Each transition is either encoded into a unique integer or set to 0 if the state does not contain all required symbols.
+*/
+std::vector<std::vector<int>> DFA::generateDFA(std::vector<std::array<char, 5>> allBuffers) {
     std::vector<std::vector<int>> states(allBuffers.size(), std::vector<int>(4, -1));
     char alphabet[4] = {'a', 'b', 'c', 'd'};
-    for (int i = 0; i < allBuffers.size(); i++){
+    for (int i = 0; i < allBuffers.size(); i++) {
         for (char ch : alphabet) {
             std::array<char, 5> newBuffer = emplace(allBuffers.at(i), ch);
             int transitionIndex = (ch == 'a') ? 0 : (ch == 'b') ? 1 : (ch == 'c') ? 2 : 3;
-            if (containsAllSymbols(newBuffer)){
+            if (containsAllSymbols(newBuffer)) {
                 states.at(i).at(transitionIndex) = encode(newBuffer);
             } else {
                 states.at(i).at(transitionIndex) = 0;
