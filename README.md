@@ -15,6 +15,6 @@ On unix based systems, this program can be run via:
 
 followed by 
 
-``` proj1.txt ```
+``` ./proj1.out ```
 
 This program can also be run via the makefile. The makefile is curretly optimized for ARM based systems, so the path to the GPM package will need to be updated on x86 systems. 
