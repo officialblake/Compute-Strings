@@ -1,7 +1,6 @@
 GMP_INC = /opt/homebrew/include    
-GMP_LIB = /opt/homebrew/lib        # Adjust this path if needed
+GMP_LIB = /opt/homebrew/lib       
 
-# Compiler and flags
 CXXFLAGS = -std=c++17 -g 
 
 strings.x: main.o dfa.o
