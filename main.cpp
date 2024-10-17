@@ -3,6 +3,12 @@
 #include <numeric>
 #include <gmpxx.h>
 
+/** ***************************************************************************
+ * Generates all possible buffers of length 5 using the alphabet {a, b, c, d}.*
+ *                                                                            *
+ * @pre   None.                                                               *
+ * @returns  A vector of arrays, each containing a valid buffer of characters.*
+ *****************************************************************************/
 std::vector<std::array<char, 5>> all_possible_buffers() {
     std::vector<std::array<char, 5>> buffers;
     char alphabet[4] = {'a', 'b', 'c', 'd'};
@@ -23,20 +29,18 @@ std::vector<std::array<char, 5>> all_possible_buffers() {
     return buffers;
 }
 
-int verifyDFA(std::vector<std::vector<int>> states, int n){
-    int count = 0;
-    for (int i = 0; i < states.size(); i++) {
-        for (int j = 0; j < 4; j++) {
-            
-            if (states[i][j] > 0) {
-                count++;
-            }
-            std::cout << "i = " << i << " j = " << j << " next state = " << states[i][j] << std::endl;
-        }
-    }
-    std::cout << "states w trans = " << count << std::endl;
-    return 0;
-}
+/** ***************************************************************************
+ * Recursively counts the valid states in the DFA.                            *
+ *                                                                            *
+ * @param  states: A vector of vectors containing integer states.             *
+ * @param  current: A vector of mpz_class for current state counts.           *
+ * @param  n:     An integer representing the number of remaining states.     *
+ * @param  count: A reference to an mpz_class that will hold the final count. *
+ * @pre   states must be a non-empty vector containing vectors of integers.   *
+ * @pre   current must be a vector of mpz_class.                              *
+ * @pre   n must be a non-negative integer.                                   *
+ * @post  count is updated to reflect the total number of valid states.       *
+ *****************************************************************************/
 void countStatesRecursive(const std::vector<std::vector<int>>& states, std::vector<mpz_class>& current, int n, mpz_class& count) {
     switch (n) {
         case 5:
@@ -55,64 +59,68 @@ void countStatesRecursive(const std::vector<std::vector<int>>& states, std::vect
             count = std::pow(4, 1);
             return;
         case 0:
-            return;  // Base case: When n is 0, stop recursion
+            return; 
         default:
-            break;  // Keep going
+            break;  
     }
 
+    std::vector<mpz_class> next(current.size(), 0);  
 
-    std::vector<mpz_class> next(current.size(), 0);  // Track the next states' counts
-
-    // Iterate over each state in the current vector
     for (int i = 0; i < current.size(); ++i) {
-        if (current[i] > 0) {  // Only process states with valid transitions
-            for (int j = 0; j < 4; ++j) {  // Iterate over alphabet {a, b, c, d}
-                int nextState = states[i][j];  // Get the next state for the current state
-                if (nextState > 0) {  // Valid transition (assuming -1 is invalid state)
-                    next[nextState] += current[i];  // Accumulate counts into the next vector
+        if (current[i] > 0) { 
+            for (int j = 0; j < 4; ++j) {  
+                int nextState = states[i][j]; 
+                if (nextState > 0) {  
+                    next[nextState] += current[i]; 
                 }
             }
         }
     }
 
-    // Recursively call with the next vector for the next step
     countStatesRecursive(states, next, n - 1, count);
-    //std::cout << " count is currently = " << (long long)count << " when n = " << n << std::endl;
-    // Update the total count (number of accepted transitions)
-  if (count <= 1024) {
-    mpz_class sum = 0;
-    for (const auto& elem : next) {
-        sum += elem;  // Use GMP's addition operator for mpz_class
+
+    if (count <= 1024) {
+        mpz_class sum = 0;
+        for (const auto& elem : next) {
+            sum += elem; 
+        }
+        count = sum;
     }
-    count = sum;
-}
 }
 
+/** ***************************************************************************
+ * Counts the valid states in the DFA.                                        *
+ *                                                                            *
+ * @param  states: A vector of vectors containing integer states.             *
+ * @param  n:     An integer representing the number of remaining states.     *
+ * @pre   states must be a non-empty vector containing vectors of integers.   *
+ * @pre   n must be a non-negative integer.                                   *
+ * @returns  The total count of valid states as an mpz_class.                 *
+ *****************************************************************************/
 mpz_class countStates(const std::vector<std::vector<int>>& states, int n) {
     int m = states.size();
-    std::vector<mpz_class> current(m, 1);  // Initially set all states with 1 for uniform start
+    std::vector<mpz_class> current(m, 1);  
 
-    // Initialize the `current` vector for valid starting states
     for (int i = 0; i < m; ++i) {
         bool hasValidTransition = false;
         for (int j = 0; j < 4; ++j) {
-            if (states[i][j] >= 0) {  // Check if the state has a valid transition
+            if (states[i][j] >= 0) {  
                 hasValidTransition = true;
                 break;
             }
         }
         if (!hasValidTransition) {
-            current[i] = 0;  // Mark state as invalid if it has no valid transitions
+            current[i] = 0;  
         }
     }
 
-    mpz_class count = 0;  // Initialize count of transitions
-    countStatesRecursive(states, current, n, count);  // Start recursive processing
-
-    return count;  // Return the final count
+    mpz_class count = 0; 
+    countStatesRecursive(states, current, n, count);  
+    return count; 
 }
-
-
+/** ***************************************************************************
+ *                              Main Function                                 *   
+ *****************************************************************************/
 int main(){
     int n;
     std::cout << "Enter an integer (1 - 300).\n n = ";

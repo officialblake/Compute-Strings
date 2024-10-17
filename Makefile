@@ -1,14 +1,17 @@
-GMP_INC = /usr/local/include    # Adjust this path to where GMP is installed
-GMP_LIB = /usr/local/lib        # Adjust this path to the GMP library location
+GMP_INC = /opt/homebrew/include    
+GMP_LIB = /opt/homebrew/lib        # Adjust this path if needed
+
+# Compiler and flags
+CXXFLAGS = -std=c++17 -g 
 
 strings.x: main.o dfa.o
-	g++ -std=c++17 -g main.o dfa.o -lgmp -lgmpxx -L$(GMP_LIB) -o strings.x
+	g++ $(CXXFLAGS) main.o dfa.o -L$(GMP_LIB) -lgmp -lgmpxx -o strings.x
 
 main.o: main.cpp dfa.h
-	g++ -std=c++17 -g -I$(GMP_INC) main.cpp -o main.o -c
+	g++ $(CXXFLAGS) -I$(GMP_INC) -c main.cpp -o main.o
 
 dfa.o: dfa.cpp dfa.h
-	g++ -std=c++17 -g -I$(GMP_INC) dfa.cpp -o dfa.o -c
+	g++ $(CXXFLAGS) -I$(GMP_INC) -c dfa.cpp -o dfa.o
 
 clean:
-	rm -f strings.x *.o
+	@rm -f strings.x *.o

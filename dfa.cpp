@@ -1,16 +1,14 @@
 #include "dfa.h"
 
-/*
-Preconditions:
-- The buffer must be an array of 5 characters, with characters chosen from {'a', 'b', 'c', 'd'}.
-Postconditions:
-- Returns true if all symbols 'a', 'b', 'c', and 'd' are present in the buffer; otherwise, returns false.
-*/
+/** ***************************************************************************
+ * Checks if all symbols 'a', 'b', 'c', and 'd' are present in the buffer.    *
+ *                                                                            *
+ * @param  buffer: An array of 5 characters chosen from {'a', 'b', 'c', 'd'}. *
+ * @pre   The buffer must be an array of 5 characters.                        *
+ * @returns  true if all symbols are present; otherwise, returns false.       *
+ *****************************************************************************/
 bool DFA::containsAllSymbols(std::array<char, 5> buffer) {
     bool a = false, b = false, c = true, d = false;
-    if (buffer.size() < 5) {
-        return true;
-    }
     for (int i = 0; i < buffer.size(); i++) {
         if (buffer.at(i) == 'a') a = true;
         else if (buffer.at(i) == 'b') b = true;
@@ -20,13 +18,14 @@ bool DFA::containsAllSymbols(std::array<char, 5> buffer) {
     return a && b && c && d;
 }
 
-/*
-Preconditions:
-- The buffer must be an array of 5 characters, with characters chosen from {'a', 'b', 'c', 'd'}.
-Postconditions:
-- Returns an integer that encodes the buffer into a unique integer based on its character composition.
-- Exits with an error message if an invalid character is found.
-*/
+/** ***************************************************************************
+ * Encodes the buffer into a unique integer based on character composition.   *
+ *                                                                            *
+ * @param  buffer: An array of 5 characters chosen from {'a', 'b', 'c', 'd'}. *
+ * @pre   The buffer must be an array of 5 characters.                        *
+ * @post  Exits with an error message if an invalid character is found.       *
+ * @returns  An integer encoding the buffer.                                  *
+ *****************************************************************************/
 int DFA::encode(std::array<char, 5> buffer) {
     int encoding = 0;
     for (int i = buffer.size() - 1; i >= 0; i--) {
@@ -46,17 +45,16 @@ int DFA::encode(std::array<char, 5> buffer) {
     return encoding;
 }
 
-/*
-Preconditions:
-- The buffer must be an array of 5 characters.
-- The character 'ch' must be from the set {'a', 'b', 'c', 'd'}.
-Postconditions:
-- Returns a new buffer where the last element is replaced with 'ch' and the rest of the elements are shifted to the left.
-*/
+/** ***************************************************************************
+ * Replaces the last element of the buffer with 'ch' and shifts elements left. *
+ *                                                                            *
+ * @param  buffer: An array of 5 characters.                                 *
+ * @param  ch: A character from the set {'a', 'b', 'c', 'd'}.               *
+ * @pre   The buffer must be an array of 5 characters.                       *
+ * @pre   The character 'ch' must be from the set {'a', 'b', 'c', 'd'}.      *
+ * @returns  A new buffer with the last element replaced by 'ch'.            *
+ *****************************************************************************/
 std::array<char, 5> DFA::emplace(std::array<char, 5> buffer, char ch) {
-    if (buffer.size() < 5) {
-        buffer.back() = ch;
-    }
     for (int i = 0; i < 4; i++) {
         buffer.at(i) = buffer.at(i + 1);
     }
@@ -64,13 +62,14 @@ std::array<char, 5> DFA::emplace(std::array<char, 5> buffer, char ch) {
     return buffer;
 }
 
-/*
-Preconditions:
-- The allBuffers vector must contain arrays of 5 characters, and each array must consist of characters from {'a', 'b', 'c', 'd'}.
-Postconditions:
-- Returns a DFA in the form of a 2D vector where each state is associated with transitions based on the input character.
-- Each transition is either encoded into a unique integer or set to 0 if the state does not contain all required symbols.
-*/
+/** ***************************************************************************
+ * Generates a DFA represented as a 2D vector based on the provided buffers.  *
+ *                                                                            *
+ * @param  allBuffers: A vector of arrays containing 5 characters each,       *
+ *                     representing all permutations of {a, b, c, d}.         *
+ * @pre   The allBuffers vector must contain arrays of 5 characters.          *
+ * @returns  A 2D vector representing the DFA with encoded transitions.       *
+ *****************************************************************************/
 std::vector<std::vector<int>> DFA::generateDFA(std::vector<std::array<char, 5>> allBuffers) {
     std::vector<std::vector<int>> states(allBuffers.size(), std::vector<int>(4, -1));
     char alphabet[4] = {'a', 'b', 'c', 'd'};
