@@ -61,7 +61,7 @@ void countStatesRecursive(const std::vector<std::vector<int>>& states, std::vect
             count = std::pow(4, 1);
             return;
         case 0:
-            count = 0;
+            count = 1;
             return; 
         default:
             break;  
