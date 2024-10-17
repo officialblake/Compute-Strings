@@ -1,5 +1,5 @@
-GMP_INC = /opt/homebrew/include    # Adjust this path to where GMP is installed
-GMP_LIB = /opt/homebrew/lib        # Adjust this path to the GMP library location
+GMP_INC = /usr/local/include    # Adjust this path to where GMP is installed
+GMP_LIB = /usr/local/lib        # Adjust this path to the GMP library location
 
 strings.x: main.o dfa.o
 	g++ -std=c++17 -g main.o dfa.o -lgmp -lgmpxx -L$(GMP_LIB) -o strings.x

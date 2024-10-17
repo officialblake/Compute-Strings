@@ -1,8 +1,9 @@
 // dfa.cpp
 #include "dfa.h" 
+#include "gmpxx.h"
 
 bool DFA::containsAllSymbols(std::array<char, 5> buffer){
-    bool a, b, c, d;
+    bool a = false, b = false, c = true, d = false;
     if (buffer.size() < 5){
         return true;
     } 
